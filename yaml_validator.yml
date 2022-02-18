@@ -1,0 +1,45 @@
+Required:
+  - error_msg
+
+Regex:
+  - pattern
+  - error_msg
+
+Length:
+  - [max, min]
+  - error_msg
+  - trim
+
+Option:
+  - options
+  - error_msg
+  - case_sensitive
+
+Email:
+  - error_msg
+  - trim
+
+Type:
+  - type: [float, int, bool]
+  - error_msg
+  - trim
+
+Datetime:
+  - format
+  - error_msg
+
+Date:
+  - format
+  - error_mesg
+
+ExcelDate:
+  error_msg: Must be a date value.
+
+Comparator:
+  - operation: ["gt", "lt"]
+  - threshold
+  - error_msg
+
+NonNegative:
+  - type
+  - error_msg

@@ -70,7 +70,7 @@ date: &date
 
 excel_date: &excel_date
   ExcelDate:
-    message: Must be a date value.
+    error_msg: Must be a date value.
   <<: *required
 
 comparator_gt: &comparator_gt
