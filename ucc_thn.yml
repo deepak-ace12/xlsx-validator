@@ -1,0 +1,146 @@
+required: &required
+  Required:
+    error_msg: Value can not be blank.
+
+regex: &regex
+  Regex:
+    #regex to validate ip
+    pattern: "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$" 
+    error_msg: Value do not match the pattern.
+    
+max_length: &max_length
+  Length:
+    max: 30
+    error_msg: Value is too long.
+
+min_length: &min_length
+  Length:
+    min: 3
+    error_msg: Value is too short.
+
+options: &options
+  Option:
+    options: [Male, Female]
+    error_msg: Invalid option.
+    case_sensitive: false #set choice validator as case insensitive (by default is case sensitive)
+
+email: &email
+  Email:
+    error_msg: Invalid email address.
+    trim: true
+
+premitive_int: &premitive_int
+  Type:
+    type: int
+    error_msg: Must be an integer value.
+    trim: true
+
+premitive_float: &premitive_float
+  Type:
+    type: float
+    error_msg: Must be a decimal value.
+    trim: true
+
+premitive_bool: &premitive_bool
+  Type:
+    type: bool
+    error_msg: Must be a boolean value i.e. true, false, 0, 1.
+    trim: true
+
+datetime: &datetime
+  Datetime:
+    format: "%d-%m-%Y %H:%M:%S"
+    error_msg: "Datetime format must be dd-mm-yyyy HH:MM:SS"
+
+date: &date
+  Date:
+    format: "%Y-%m-%d"
+    error_mesg: Date format must be yyyy-mm-dd
+
+excel_date: &excel_date
+  ExcelDate:
+    message: Must be a date value
+    trim: true
+
+comarator_gt: &comparator_gt
+  Comparator:
+    operation: "gt"
+    threshold: 0
+    error_msg: value should not be greater than 10
+
+comarator_lt: &comparator_lt
+  Comparator:
+    operation: "lt"
+    threshold: 0
+    error_msg: value should not be less than 10
+
+not_negative: &not_negative
+  NonNegative:
+    type: int
+    error_msg: Must be a non negative value
+
+
+# CASE: 1 - if column names are fixed but their positions are not,
+# create the yaml file with column names
+# CASE: 2 - if column names are not fixed but the position of the columns are,
+# create the yaml file with column letters i.e. A, B, C, etc.
+# look for COLUMN_CASES comment in validate_xlsx.py file
+
+patients:
+  excludes: ["L"] #these columns will not be validated
+  iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+  validations:
+    default:
+      - <<: *required
+
+    # default validator works for columns for which no validation is defined.
+    # default validator does not work for excluded columns.
+
+    columns:
+      A:
+        - <<: *required
+        - <<: *regex
+
+      B:
+        - Length:
+            max: 3
+            max_message: Value is too long
+
+        - Required:
+            message: Value can not be blank
+      C:
+        - Length:
+            min: 3
+            min_message: Value is too short
+
+      D:
+        - Length:
+            min: 3
+            min_message: Value is too short
+
+      E:
+        - <<: *options
+
+      G:
+        - Email:
+            message: "Field should be correct email address"
+            trim: true
+            #if set: value will be trimmed (remove trailing and leading white characters) before validation
+            #default: False
+
+      H:
+        - Type:
+            type: integer
+            message: "Value should be integer"
+            trim: true
+
+      I:
+        - Type:
+            type: integer
+            message: "Value should be integer"
+            trim: true
+
+      J:
+        - ExcelDate:
+            message: "Value should be a date value"
+            trim: true
