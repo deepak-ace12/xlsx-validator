@@ -5,28 +5,23 @@ from validate_email import validate_email
 from openpyxl.utils.datetime import from_excel
 
 
-
 class BaseValidator:
     __metaclass__ = ABCMeta
 
-
     @abstractmethod
     def validate(self, value):
-        if self.trim and type(value) is str:
+        if self.trim:
             return value.strip()
 
         return value
 
-    def get_error_msg(self):
-        return self.error_msg
-
-    # When we search for an attribute in a class that is involved 
+    # When we search for an attribute in a class that is involved
     # in python multiple inheritance, an order is followed.
-    # First, it is searched in the current class. If not found, 
-    # the search moves to parent classes. This is left-to-right, 
-    # depth-first. This order is called linearization of class Child, 
+    # First, it is searched in the current class. If not found,
+    # the search moves to parent classes. This is left-to-right,
+    # depth-first. This order is called linearization of class Child,
     # and the set of rules applied are called MRO (Method Resolution Order).
-    # To get the MRO of a class, you can use either the __mro__ attribute 
+    # To get the MRO of a class, you can use either the __mro__ attribute
     # or the mro() method.
     @classmethod
     def __subclasshook__(cls, C):
@@ -42,7 +37,6 @@ class BaseValidator:
 
 
 class ChoiceValidator(BaseValidator):
-
     def validate(self, value):
         if value:
             value = super(ChoiceValidator, self).validate(value)
@@ -56,7 +50,6 @@ class ChoiceValidator(BaseValidator):
 
 
 class DateTimeValidator(BaseValidator):
-
     def validate(self, value):
         if value:
             value = super(DateTimeValidator, self).validate(value)
@@ -64,7 +57,7 @@ class DateTimeValidator(BaseValidator):
                 try:
                     value = value.strftime(self.format)
                 except Exception as ex:
-                    raise Exception(self.error_msg)    
+                    raise Exception(self.error_msg)
             try:
                 datetime.strptime(value, self.format)
             except ValueError:
@@ -79,12 +72,11 @@ class EmailValidator(BaseValidator):
         if value:
             value = super(EmailValidator, self).validate(value)
             if type(value) is str:
-                return  validate_email(value)
+                return validate_email(value)
             return False
 
 
 class ExcelDateValidator(DateTimeValidator):
-
     def validate(self, value):
         if value:
             if isinstance(value, int):
@@ -93,7 +85,6 @@ class ExcelDateValidator(DateTimeValidator):
 
 
 class LengthValidator(BaseValidator):
-
     def validate(self, value):
         if value:
             value = super(LengthValidator, self).validate(value)
@@ -104,14 +95,12 @@ class LengthValidator(BaseValidator):
 
 
 class RequiredValidator(BaseValidator):
-    
     def validate(self, value):
         if value in ["", None]:
             raise Exception(self.error_msg)
 
 
 class RegexValidator(BaseValidator):
-
     def validate(self, value):
         if value:
             value = super(RegexValidator, self).validate(value)
@@ -120,13 +109,8 @@ class RegexValidator(BaseValidator):
 
 
 class TypeValidator(BaseValidator):
-
     def validate(self, value):
-        string_to_func = {
-            "int": int,
-            "float": float,
-            "bool": bool
-        }
+        string_to_func = {"int": int, "float": float, "bool": bool}
         if value:
             value = super(TypeValidator, self).validate(value)
             try:
@@ -136,7 +120,6 @@ class TypeValidator(BaseValidator):
 
 
 class NonNegativeValidator(TypeValidator):
-
     def validate(self, value):
         if value:
             super(NonNegativeValidator, self).validate(value)
@@ -145,13 +128,12 @@ class NonNegativeValidator(TypeValidator):
 
 
 class ComparatorValidator(BaseException):
-
     def validate(self, value):
 
         if value:
             if not value.replace(".", "").isdigit():
                 raise Exception("Cell value must be a number.")
             if self.operation == "gt" and eval(value) <= self.threshold:
-                    raise Exception(self.error_msg)
+                raise Exception(self.error_msg)
             if self.operation == "lt" and eval(value) >= self.threshold:
                 raise Exception(self.error_msg)
