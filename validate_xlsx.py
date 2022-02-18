@@ -11,7 +11,7 @@ from validators import (
     LengthValidator,
     RegexValidator,
     EmailValidator,
-    ChoiceValidator,
+    OptionValidator,
     DateTimeValidator,
     ExcelDateValidator,
     NonNegativeValidator,
@@ -26,24 +26,22 @@ def is_valid_cell(valdn_type, value, coordinate, errors):
         "Length": LengthValidator,
         "Regex": RegexValidator,
         "Email": EmailValidator,
-        "Choice": ChoiceValidator,
+        "Option": OptionValidator,
         "Date": DateTimeValidator,
         "ExcelDate": ExcelDateValidator,
-        "ComparatorValidator": ComparatorValidator,
-        "NonNegativeValidator": NonNegativeValidator,
+        "Comparator": ComparatorValidator,
+        "NonNegative": NonNegativeValidator,
+        "Datetime": DateTimeValidator,
     }
 
     violations = []
-    # TODO: try to avoid [0]
-    name = list(valdn_type.keys())[0]
-    data = list(valdn_type.values())[0]
-    validator = classmap[name](data)  # creating the object with the parameters
-    try:
-        validator.validate(value)
-    except Exception as ex:
-        violations.append(ex)
+    for typ, data in valdn_type.items():
+        validator = classmap[typ](data)  # creating the object with the parameters
+        try:
+            validator.validate(value)
+        except Exception as ex:
+            violations.append(ex)
     # TODO: try to avoid violations
-
     if violations:
         errors.append((coordinate, violations))
 
@@ -101,9 +99,6 @@ def validate(config, worksheet):
 
 
 def validate_excel(xlsx_filepath, yaml_filepath):
-    # import ipdb; ipdb.set_trace()
-    # file_size = os.path.getsize(xlsx_filepath) > 10485760
-
     try:
         workbook = load_workbook(xlsx_filepath)
         sheets = workbook.sheetnames

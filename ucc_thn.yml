@@ -54,7 +54,6 @@ premitive_bool: &premitive_bool
   Type:
     type: bool
     error_msg: Must be a boolean value i.e. true, false, 0, 1.
-    trim: true
   <<: *required
 
 datetime: &datetime
@@ -72,7 +71,6 @@ date: &date
 excel_date: &excel_date
   ExcelDate:
     message: Must be a date value.
-    trim: true
   <<: *required
 
 comparator_gt: &comparator_gt
@@ -120,6 +118,8 @@ Example:
         - <<: *options
           Option:
             options: [Ms., Mr., Mrs.]
+            case_sensitive: false
+            error_msg: Invalid option.
 
       First Name:
         - <<: *min_length

@@ -10,7 +10,7 @@ class BaseValidator:
 
     @abstractmethod
     def validate(self, value):
-        if self.trim:
+        if hasattr(self, 'trim'):
             return value.strip()
 
         return value
@@ -36,16 +36,15 @@ class BaseValidator:
                 setattr(self, key, value)
 
 
-class ChoiceValidator(BaseValidator):
+class OptionValidator(BaseValidator):
     def validate(self, value):
         if value:
-            value = super(ChoiceValidator, self).validate(value)
-
+            value = super(OptionValidator, self).validate(value)
             if not self.case_sensitive:
                 value = value.lower()
-                if value not in [option.lower for option in self.options]:
+                if value not in [option.lower() for option in self.options]:
                     raise Exception(self.error_msg)
-            elif value not in [self.options]:
+            elif value not in self.options:
                 raise Exception(self.error_msg)
 
 
@@ -88,9 +87,9 @@ class LengthValidator(BaseValidator):
     def validate(self, value):
         if value:
             value = super(LengthValidator, self).validate(value)
-            if self.min and len(value) < int(self.min):
+            if hasattr(self, "min") and len(value) < int(self.min):
                 raise Exception(self.error_msg)
-            if self.max and len(value) > int(self.max):
+            if hasattr(self, "max") and len(value) > int(self.max):
                 raise Exception(self.error_msg)
 
 
@@ -127,13 +126,14 @@ class NonNegativeValidator(TypeValidator):
             raise Exception(self.error_msg)
 
 
-class ComparatorValidator(BaseException):
+class ComparatorValidator(BaseValidator):
     def validate(self, value):
 
         if value:
-            if not value.replace(".", "").isdigit():
+            value = str(value)
+            if not str(value).replace(".", "").isdigit():
                 raise Exception("Cell value must be a number.")
-            if self.operation == "gt" and eval(value) <= self.threshold:
+            if self.operation == "gt" and eval(value) >= self.threshold:
                 raise Exception(self.error_msg)
-            if self.operation == "lt" and eval(value) >= self.threshold:
+            if self.operation == "lt" and eval(value) <= self.threshold:
                 raise Exception(self.error_msg)
