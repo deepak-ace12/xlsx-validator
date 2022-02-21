@@ -15,7 +15,7 @@ from validators import (
 )
 
 
-def is_valid_cell(valdn_type, value, coordinate, errors):
+def is_valid_cell(valdn_type, value, coordinates, errors):
     classmap = {
         "Required": RequiredValidator,
         "Type": TypeValidator,
@@ -30,17 +30,14 @@ def is_valid_cell(valdn_type, value, coordinate, errors):
         "Datetime": DateTimeValidator,
     }
 
-    violations = []
-
     for typ, data in valdn_type.items():
         validator = classmap[typ](data)  # creating the object with the parameters
         try:
             validator.validate(value)
         except Exception as ex:
-            violations.append(ex)
-
-    if violations:
-        errors.append((coordinate, violations))
+            coordinates["Error"] = ex.args[0]
+            if coordinates not in errors:
+                errors.append(coordinates)
 
 
 def set_config(yaml_config, yaml_validator_cls):
@@ -76,25 +73,21 @@ def validate(config, worksheet):
     ):
         for cell in row:
             column_header = column_letter_to_header[cell.column_letter]
-            try:
-                value = cell.value
-            except ValueError:
-                errors.append((cell.coordinate, ValueError))
-            if column_header in config.get(
-                "excludes", []
-            ):
+            coordinates = {
+                "Header": column_header,
+                "Cell": cell.coordinate,
+            }
+            if column_header in config.get("excludes", []):
                 continue
             if column_header in columns_to_validate:
-                for valdn_type in columns_to_validate[
-                    column_header
-                ]:
-                    is_valid_cell(valdn_type, value, cell.coordinate, errors)
+                for valdn_type in columns_to_validate[column_header]:
+                    is_valid_cell(valdn_type, cell.value, coordinates, errors)
 
             elif config.get("validations").get("default"):
                 is_valid_cell(
                     config.get("validations").get("default")[0],
-                    value,
-                    cell.coordinate,
+                    cell.value,
+                    coordinates,
                     errors,
                 )
 

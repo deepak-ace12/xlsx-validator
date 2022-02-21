@@ -51,7 +51,7 @@ class DateTimeValidator(BaseValidator):
     def validate(self, value):
         if value:
             value = super(DateTimeValidator, self).validate(value)
-            if type(value) is datetime: # For Date Only
+            if type(value) is datetime:  # For Date Only
                 try:
                     value = value.strftime(self.format)
                 except Exception as ex:
