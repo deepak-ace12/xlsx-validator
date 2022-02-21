@@ -1,4 +1,5 @@
 import yaml
+import argparse
 
 
 class YamlValidator:
@@ -65,5 +66,8 @@ class YamlValidator:
 
 
 if __name__ == "__main__":
-    dev_file = "/Users/I1597/Documents/repositories/excel_validator/ucc_thn.yml"
+    parser = argparse.ArgumentParser(description="Add path of your yaml file to validate it.")
+    parser.add_argument("--dev_yaml_file_path", required=True, nargs=1, type=str)
+    args = parser.parse_args()
+    dev_file = args.dev_yaml_file_path[0]
     YamlValidator(dev_file).validate_yaml()
