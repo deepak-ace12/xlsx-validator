@@ -1,6 +1,6 @@
 required: &required
   Required:
-    error_msg: Value can not be blank.
+    error_msg: Cell Value can not be blank.
 
 regex: &regex
   Regex:
