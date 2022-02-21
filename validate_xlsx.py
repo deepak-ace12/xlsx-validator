@@ -1,10 +1,6 @@
-import os.path
 import sys
-import time
 import yaml
 from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import PatternFill
-from openpyxl.utils import column_index_from_string, get_column_letter
 from validators import (
     RequiredValidator,
     TypeValidator,
@@ -35,6 +31,7 @@ def is_valid_cell(valdn_type, value, coordinate, errors):
     }
 
     violations = []
+
     for typ, data in valdn_type.items():
         validator = classmap[typ](data)  # creating the object with the parameters
         try:
@@ -52,7 +49,7 @@ def set_config(yaml_config, yaml_validator_cls):
     """
     with open(yaml_config, "r") as yml:
         config = yaml.safe_load(yml).get(yaml_validator_cls)
-        config["default"] = config.get("validations").get("default")[0] or None
+        # config["default"] = config.get("validations").get("default")[0] or None
         return config
 
 
@@ -92,8 +89,13 @@ def validate(config, worksheet):
                 ]:
                     is_valid_cell(valdn_type, value, cell.coordinate, errors)
 
-            elif config.get("default"):
-                is_valid_cell(config["default"], value, cell.coordinate, errors)
+            elif config.get("validations").get("default"):
+                is_valid_cell(
+                    config.get("validations").get("default")[0],
+                    value,
+                    cell.coordinate,
+                    errors,
+                )
 
     print(errors)  # TODO: do something about error logging
 

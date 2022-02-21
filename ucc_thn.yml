@@ -4,21 +4,23 @@ required: &required
 
 regex: &regex
   Regex:
-    #regex to validate ip
+    #regex for alphanumeric value
     pattern: "^[a-zA-Z0-9_]+$"
     error_msg: Value do not match the pattern.
   <<: *required
 
 max_length: &max_length
   Length:
-    max: 30
+    operation: max
+    threshold: 30
     error_msg: Value is too long.
     trim: true
   <<: *required
 
 min_length: &min_length
   Length:
-    min: 3
+    operation: min
+    threshold: 3
     error_msg: Value is too short.
     trim: false
   <<: *required
@@ -27,7 +29,7 @@ options: &options
   Option:
     options: [Male, Female]
     error_msg: Invalid option.
-    case_sensitive: false #set choice validator as case insensitive (by default is case sensitive)
+    case_sensitive: false
   <<: *required
 
 email: &email
@@ -54,6 +56,7 @@ premitive_bool: &premitive_bool
   Type:
     type: bool
     error_msg: Must be a boolean value i.e. true, false, 0, 1.
+    trim: true
   <<: *required
 
 datetime: &datetime
@@ -65,7 +68,7 @@ datetime: &datetime
 date: &date
   Date:
     format: "%Y-%m-%d"
-    error_mesg: Date format must be yyyy-mm-dd.
+    error_msg: Date format must be yyyy-mm-dd.
   <<: *required
 
 excel_date: &excel_date
@@ -94,6 +97,10 @@ not_negative: &not_negative
   <<: *required
 
 
+sheets:     # names of the sheets of the file
+  - Example
+
+
 # CASE: 1 - if column names are fixed but their positions are not,
 # create the yaml file with column names
 # CASE: 2 - if column names are not fixed but the position of the columns are,
@@ -101,14 +108,16 @@ not_negative: &not_negative
 # look for COLUMN_CASES comment in validate_xlsx.py file
 
 Example:
-  excludes: ["Exclude 1", "Exclude 2"] #these columns will not be validated
+  excludes: ["Exclude 1", "Exclude 2"] # these columns will not be validated
   iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
   validations:
-    default:
-      - <<: *required
 
     # default validator works for columns for which no validation is defined.
     # default validator does not work for excluded columns.
+    # remove this class if you don't want to set default validator
+
+    default:
+      - <<: *required
 
     columns:
       ID:

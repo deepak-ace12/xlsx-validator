@@ -1,3 +1,4 @@
+
 Required:
   - error_msg
 
@@ -6,7 +7,8 @@ Regex:
   - error_msg
 
 Length:
-  - [max, min]
+  - operation
+  - threshold
   - error_msg
   - trim
 
@@ -20,7 +22,7 @@ Email:
   - trim
 
 Type:
-  - type: [float, int, bool]
+  - type
   - error_msg
   - trim
 
@@ -30,16 +32,21 @@ Datetime:
 
 Date:
   - format
-  - error_mesg
+  - error_msg
 
 ExcelDate:
-  error_msg: Must be a date value.
+  - error_msg
 
 Comparator:
-  - operation: ["gt", "lt"]
+  - operation
   - threshold
   - error_msg
 
 NonNegative:
   - type
   - error_msg
+
+high_level_keys:
+  - excludes
+  - iterate_by_header_name
+  - validations

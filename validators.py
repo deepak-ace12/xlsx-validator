@@ -10,7 +10,7 @@ class BaseValidator:
 
     @abstractmethod
     def validate(self, value):
-        if hasattr(self, 'trim'):
+        if hasattr(self, "trim"):
             return value.strip()
 
         return value
@@ -87,9 +87,9 @@ class LengthValidator(BaseValidator):
     def validate(self, value):
         if value:
             value = super(LengthValidator, self).validate(value)
-            if hasattr(self, "min") and len(value) < int(self.min):
+            if self.operation == "min" and len(value) < self.threshold:
                 raise Exception(self.error_msg)
-            if hasattr(self, "max") and len(value) > int(self.max):
+            if self.operation == "max" and len(value) > self.threshold:
                 raise Exception(self.error_msg)
 
 
