@@ -75,17 +75,18 @@ def validate(config, worksheet):
         min_row=start_row, max_col=len(column_letter_to_header)
     ):
         for cell in row:
+            column_header = column_letter_to_header[cell.column_letter]
             try:
                 value = cell.value
             except ValueError:
                 errors.append((cell.coordinate, ValueError))
-            if column_letter_to_header[cell.column_letter] in config.get(
+            if column_header in config.get(
                 "excludes", []
             ):
                 continue
-            if column_letter_to_header[cell.column_letter] in columns_to_validate:
+            if column_header in columns_to_validate:
                 for valdn_type in columns_to_validate[
-                    column_letter_to_header[cell.column_letter]
+                    column_header
                 ]:
                     is_valid_cell(valdn_type, value, cell.coordinate, errors)
 
