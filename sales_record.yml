@@ -1,0 +1,90 @@
+required: &required
+  Required:
+    error_msg: Cell Value can not be blank.
+
+options: &options
+  Option:
+    options:
+      - Online
+      - Offline
+    error_msg: Cell value must be a valid option.
+    case_sensitive: false
+  <<: *required
+
+premitive_float: &premitive_float
+  Type:
+    type: float
+    error_msg: Cell value must be a decimal value.
+  <<: *required
+
+date: &date
+  Date:
+    format: "%m/%d/%Y"
+    error_msg: Date format must be mm/dd/yyyy.
+  <<: *required
+
+not_negative: &not_negative
+  NonNegative:
+    type: int
+    error_msg: Cell value must be a non negative value.
+  <<: *required
+
+
+sheets:     # names of the sheets of the file
+  - Sales
+
+
+# CASE: 1 - if column names are fixed but their positions are not,
+# create the yaml file with column names
+# CASE: 2 - if column names are not fixed but the position of the columns are,
+# create the yaml file with column letters i.e. A, B, C, etc.
+# look for COLUMN_CASES comment in validate_xlsx.py file
+
+Sales:
+  excludes: [] # these columns will not be validated
+  iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+  
+  validations:
+
+    # default validator works for columns for which no validation is defined.
+    # default validator does not work for excluded columns.
+    # remove this class if you don't want to set default validator
+
+    default:
+      - <<: *required
+
+    columns:
+      Sales Channel:
+        - <<: *options
+      
+      Order Priority:
+        - <<: *options
+          Option:
+            options: [C, H, L, M]
+            case_sensitive: false
+            error_msg: Invalid option.
+      
+      Order Date:
+        - <<: *date
+      
+      Unit Sold:
+        - <<: *not_negative
+      
+      Unit Price:
+        - <<: *premitive_float
+        - <<: *not_negative
+
+      Unit Cost:
+        - <<: *premitive_float
+        - <<: *not_negative
+      
+      Total Revenue:
+        - <<: *premitive_float
+        - <<: *not_negative
+      
+      Total Cost:
+        - <<: *premitive_float
+        - <<: *not_negative
+      
+      Total Profit:
+        - <<: *premitive_float      

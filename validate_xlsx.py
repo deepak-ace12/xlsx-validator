@@ -56,7 +56,6 @@ def validate(config, worksheet):
 
     # ********************** COLUMN_CASES ******************* #
     column_letter_to_header = {}
-    max_active_column = 0
     for row in worksheet.iter_rows(max_row=1):
         for cell in row:
             if cell.value:
@@ -69,7 +68,7 @@ def validate(config, worksheet):
         for key, _ in column_letter_to_header.items():
             column_letter_to_header[key] = key
     for row in worksheet.iter_rows(
-        min_row=start_row, max_col=len(column_letter_to_header)
+        min_row=start_row, max_col=worksheet.max_column
     ):
         for cell in row:
             column_header = column_letter_to_header[cell.column_letter]
@@ -97,7 +96,7 @@ def validate(config, worksheet):
 
 def validate_excel(xlsx_filepath, yaml_filepath):
     try:
-        workbook = load_workbook(xlsx_filepath)
+        workbook = load_workbook(xlsx_filepath, read_only=True)
         sheets = workbook.sheetnames
         for sheet in sheets:
             config = set_config(yaml_filepath, sheet)
@@ -108,6 +107,10 @@ def validate_excel(xlsx_filepath, yaml_filepath):
 
 
 if __name__ == "__main__":
-    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/sample.xlsx"
+    import time
+    t1 = time.time()
+    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/ABC.xlsx"
     yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/ucc_thn.yml"
     validate_excel(xlsx_filepath, yaml_filepath)
+    t2 = time.time()
+    print("Total Time", (t2-t1))
