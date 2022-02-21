@@ -1,12 +1,11 @@
+import os
 import yaml
 import argparse
 
 
 class YamlValidator:
     def __init__(self, dev_file, ref_file=None):
-        ref_file = (
-            "/Users/I1597/Documents/repositories/excel_validator/reference_yaml.yml"
-        )
+        ref_file = os.path.abspath("reference_yaml.yml")
         with open(dev_file, "r") as d_yml:
             self.dev_yaml = yaml.safe_load(d_yml)
 

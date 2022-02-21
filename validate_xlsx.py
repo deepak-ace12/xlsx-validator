@@ -97,7 +97,8 @@ def validate(config, worksheet):
                     errors,
                 )
 
-    print(errors)  # TODO: do something about error logging
+    for error in errors:
+        print(error)  # TODO: do something about error logging
 
 
 def validate_excel(xlsx_filepath, yaml_filepath):

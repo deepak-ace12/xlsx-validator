@@ -1,6 +1,15 @@
+# Every class should be of the below form:
+# ClassName:
+#   - must have field 1
+#   - must have field 2
+#   - ...
+#   - ...
+#   - must have field n
+
 
 Required:
   - error_msg
+  - trim
 
 Regex:
   - pattern

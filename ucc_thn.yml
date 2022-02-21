@@ -1,6 +1,7 @@
 required: &required
   Required:
     error_msg: Value can not be blank.
+    trim: true
 
 regex: &regex
   Regex:
@@ -72,8 +73,10 @@ date: &date
   <<: *required
 
 excel_date: &excel_date
+  # sometimes dates in excel are stored as number, e.g.
+  # 42029 is 25/1/2015 and 42029.59236 is 2015-01-25 14:12:59
   ExcelDate:
-    error_msg: Must be a date value.
+    error_msg: Value must be an excel date integer.
   <<: *required
 
 comparator_gt: &comparator_gt

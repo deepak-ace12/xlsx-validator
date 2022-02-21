@@ -1,7 +1,6 @@
 import re
 from datetime import datetime
 from abc import ABCMeta, abstractmethod, abstractproperty
-from validate_email import validate_email
 from openpyxl.utils.datetime import from_excel
 
 
@@ -52,11 +51,6 @@ class DateTimeValidator(BaseValidator):
     def validate(self, value):
         if value:
             value = super(DateTimeValidator, self).validate(value)
-            if type(value) is datetime:
-                try:
-                    value = value.strftime(self.format)
-                except Exception as ex:
-                    raise Exception(self.error_msg)
             try:
                 datetime.strptime(value, self.format)
             except ValueError:
@@ -64,23 +58,25 @@ class DateTimeValidator(BaseValidator):
 
 
 class EmailValidator(BaseValidator):
-
-    message = "Value is not a correct email address"
-
     def validate(self, value):
         if value:
             value = super(EmailValidator, self).validate(value)
-            if type(value) is str:
-                return validate_email(value)
-            return False
+            regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+            if not re.fullmatch(regex, value):
+                raise Exception(self.error_msg)
 
 
 class ExcelDateValidator(DateTimeValidator):
     def validate(self, value):
         if value:
-            if isinstance(value, int):
-                value = from_excel(value)
-        super(DateTimeValidator, self).validate(value)
+            value = super(ExcelDateValidator, self).validate(value)
+            try:
+                if str(value).isdigit():
+                    from_excel(int(value))
+                else:
+                    from_excel(float(value))
+            except Exception as ex:
+                raise Exception(self.error_msg)
 
 
 class LengthValidator(BaseValidator):
@@ -95,6 +91,7 @@ class LengthValidator(BaseValidator):
 
 class RequiredValidator(BaseValidator):
     def validate(self, value):
+        value = super(RequiredValidator, self).validate(value)
         if value in ["", None]:
             raise Exception(self.error_msg)
 
