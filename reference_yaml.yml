@@ -9,7 +9,6 @@
 
 Required:
   - error_msg
-  - trim
 
 Regex:
   - pattern
@@ -33,7 +32,6 @@ Email:
 Type:
   - type
   - error_msg
-  - trim
 
 Datetime:
   - format

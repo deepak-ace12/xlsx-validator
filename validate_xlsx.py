@@ -38,7 +38,7 @@ def is_valid_cell(valdn_type, value, coordinate, errors):
             validator.validate(value)
         except Exception as ex:
             violations.append(ex)
-    # TODO: try to avoid violations
+
     if violations:
         errors.append((coordinate, violations))
 

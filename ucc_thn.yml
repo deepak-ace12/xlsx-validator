@@ -1,20 +1,19 @@
 required: &required
   Required:
     error_msg: Value can not be blank.
-    trim: true
 
 regex: &regex
   Regex:
     #regex for alphanumeric value
     pattern: "^[a-zA-Z0-9_]+$"
-    error_msg: Value do not match the pattern.
+    error_msg: Cell value do not match the pattern.
   <<: *required
 
 max_length: &max_length
   Length:
     operation: max
     threshold: 30
-    error_msg: Value is too long.
+    error_msg: Cell value is too long in length.
     trim: true
   <<: *required
 
@@ -22,48 +21,45 @@ min_length: &min_length
   Length:
     operation: min
     threshold: 3
-    error_msg: Value is too short.
+    error_msg: Cell value is too short in length.
     trim: false
   <<: *required
 
 options: &options
   Option:
     options: [Male, Female]
-    error_msg: Invalid option.
+    error_msg: Cell value must be a valid option.
     case_sensitive: false
   <<: *required
 
 email: &email
   Email:
-    error_msg: Invalid email address.
+    error_msg: Cell has an invalid email address.
     trim: true
   <<: *required
 
 premitive_int: &premitive_int
   Type:
     type: int
-    error_msg: Must be an integer value.
-    trim: true
+    error_msg: Cell value must be an integer value.
   <<: *required
 
 premitive_float: &premitive_float
   Type:
     type: float
-    error_msg: Must be a decimal value.
-    trim: true
+    error_msg: Cell value must be a decimal value.
   <<: *required
 
 premitive_bool: &premitive_bool
   Type:
     type: bool
-    error_msg: Must be a boolean value i.e. true, false, 0, 1.
-    trim: true
+    error_msg: Cell value must be a boolean value i.e. true, false, 0, 1.
   <<: *required
 
 datetime: &datetime
   Datetime:
     format: "%d-%m-%Y %H:%M:%S"
-    error_msg: "Datetime format must"
+    error_msg: Datetime format must be %d-%m-%Y %H:%M:%S
   <<: *required
 
 date: &date
@@ -83,20 +79,20 @@ comparator_gt: &comparator_gt
   Comparator:
     operation: "gt"
     threshold: 10
-    error_msg: value should not be greater than 10.
+    error_msg: Cell value should not be greater than 10.
   <<: *required
 
 comparator_lt: &comparator_lt
   Comparator:
     operation: "lt"
     threshold: 0
-    error_msg: value should not be less than 0.
+    error_msg: Cell value should not be less than 0.
   <<: *required
 
 not_negative: &not_negative
   NonNegative:
     type: int
-    error_msg: Must be a non negative value.
+    error_msg: Cell value must be a non negative value.
   <<: *required
 
 
