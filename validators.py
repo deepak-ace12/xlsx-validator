@@ -122,8 +122,6 @@ class TypeValidator(BaseValidator):
 
 class NonNegativeValidator(TypeValidator):
     def validate(self, value):
-        if value == "-10":
-            import ipdb; ipdb.set_trace()
         if value:
             super(NonNegativeValidator, self).validate(value)
         if value < 0:

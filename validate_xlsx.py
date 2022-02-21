@@ -109,8 +109,8 @@ def validate_excel(xlsx_filepath, yaml_filepath):
 if __name__ == "__main__":
     import time
     t1 = time.time()
-    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/ABC.xlsx"
-    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/ucc_thn.yml"
+    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/one_lakh_record.xlsx"
+    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/sales_record.yml"
     validate_excel(xlsx_filepath, yaml_filepath)
     t2 = time.time()
     print("Total Time", (t2-t1))
