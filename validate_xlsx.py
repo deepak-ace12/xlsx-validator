@@ -114,8 +114,9 @@ def validate_excel(xlsx_filepath, yaml_filepath):
         sheets = workbook.sheetnames
         for sheet in sheets:
             config = set_config(yaml_filepath, sheet)
-            worksheet = workbook[sheet]
-            validate(config, worksheet)
+            if config:
+                worksheet = workbook[sheet]
+                validate(config, worksheet)
     except Exception as e:
         sys.exit("Error occured: " + str(e))
 

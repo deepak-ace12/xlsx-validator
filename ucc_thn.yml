@@ -97,7 +97,7 @@ not_negative: &not_negative
   <<: *required
 
 
-sheets:     # names of the sheets of the file
+sheets:     # names of the sheets of the file that need validation
   - Example
   - Students
 
