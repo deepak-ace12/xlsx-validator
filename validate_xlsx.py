@@ -90,7 +90,7 @@ def validate(config, worksheet):
                 "Header": column_header,
                 "Cell": cell.coordinate,
             }
-            if column_header in config.get("excludes", []):
+            if column_header in config.get("exclude", []):
                 continue
             if column_header in columns_to_validate:
                 for valdn_type in columns_to_validate[column_header]:

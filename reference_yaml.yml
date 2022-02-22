@@ -55,7 +55,7 @@ NonNegative:
   - error_msg
 
 high_level_keys:
-  - excludes
+  - exclude
   - iterate_by_header_name
   - validations
   - must_have_columns

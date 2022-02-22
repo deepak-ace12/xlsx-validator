@@ -108,8 +108,8 @@ sheets:     # names of the sheets of the file that need validation
 # create the yaml file with column letters i.e. A, B, C, etc.
 # look for COLUMN_CASES comment in validate_xlsx.py file
 
-Example:
-  excludes:         # these columns will not be validated
+Example:  # Sheet Name
+  exclude:         # these columns will not be validated
     - "Exclude 1"
     - "Exclude 2"
 
@@ -176,8 +176,9 @@ Example:
       Username:
         - <<: *regex
 
-Students:
-  excludes: []        # these columns will not be validated
+
+Students: # Sheet Name
+  exclude: []
 
   iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
 
