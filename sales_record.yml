@@ -67,7 +67,7 @@ Sales:
       Order Date:
         - <<: *date
       
-      Unit Sold:
+      Units Sold:
         - <<: *not_negative
       
       Unit Price:

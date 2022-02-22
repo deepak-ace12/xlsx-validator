@@ -53,7 +53,19 @@ def set_config(yaml_config, yaml_validator_cls):
 def validate(config, worksheet):
     errors = []
     columns_to_validate = config.get("validations").get("columns")
-
+    must_have_columns = config.get("must_have_columns")
+    if not set(must_have_columns).issubset(set(columns_to_validate.keys())):
+        raise Exception(
+            {
+                "Sheet": worksheet.title,
+                "Error": "Sheet {sheet} must have column(s) {missing_columns}".format(
+                    sheet=worksheet.title,
+                    missing_columns=", ".join(
+                        list(set(must_have_columns) - set(columns_to_validate.keys()))
+                    ),
+                ),
+            }
+        )
     # ********************** COLUMN_CASES ******************* #
     column_letter_to_header = {}
     for row in worksheet.iter_rows(max_row=1):
@@ -67,12 +79,11 @@ def validate(config, worksheet):
     else:
         for key, _ in column_letter_to_header.items():
             column_letter_to_header[key] = key
-    for row in worksheet.iter_rows(
-        min_row=start_row, max_col=worksheet.max_column
-    ):
+    for row in worksheet.iter_rows(min_row=start_row, max_col=worksheet.max_column):
         for cell in row:
             column_header = column_letter_to_header[cell.column_letter]
             coordinates = {
+                "Sheet": worksheet.title,
                 "Header": column_header,
                 "Cell": cell.coordinate,
             }
@@ -108,9 +119,10 @@ def validate_excel(xlsx_filepath, yaml_filepath):
 
 if __name__ == "__main__":
     import time
+
     t1 = time.time()
-    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/one_lakh_record.xlsx"
-    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/sales_record.yml"
+    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/sample.xlsx"
+    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/ucc_thn.yml"
     validate_excel(xlsx_filepath, yaml_filepath)
     t2 = time.time()
-    print("Total Time", (t2-t1))
+    print("Total Time", (t2 - t1))

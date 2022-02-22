@@ -107,8 +107,19 @@ sheets:     # names of the sheets of the file
 # look for COLUMN_CASES comment in validate_xlsx.py file
 
 Example:
-  excludes: ["Exclude 1", "Exclude 2"] # these columns will not be validated
+  excludes:         # these columns will not be validated
+    - "Exclude 1"
+    - "Exclude 2"
+
   iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+
+  must_have_columns:
+    - ID
+    - Gender
+    - First Name
+    - Last Name
+    - Email
+
   validations:
 
     # default validator works for columns for which no validation is defined.
