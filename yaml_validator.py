@@ -33,7 +33,7 @@ class YamlValidator:
             columns = sheet_data.get("validations").get("columns")
             if not columns:
                 validation_errors.append(
-                    "validation class must have the list of columns"
+                    f"Sheet {sheet} validation's class must have the list of columns"
                 )
 
             for column_name, validations in columns.items():
@@ -44,17 +44,20 @@ class YamlValidator:
                         )
                         if not is_valid:
                             validation_errors.append(
-                                "{column_name} column's {class_name} class is missing {missing_keys}".format(
+                                "{sheet} sheet {column_name} column's {class_name} class is missing {missing_keys}".format(
+                                    sheet=sheet,
                                     column_name=column_name,
                                     class_name=class_name,
                                     missing_keys=", ".join(missing_keys),
                                 )
                             )
             if validation_errors:
-                raise Exception(validation_errors)
+                for error in validation_errors:
+                    print(error)
             else:
                 print(
-                    "Yaml file is validated successfully. There's no validation error."
+                    "Yaml file's %s sheet is validated successfully. There's no validation error."
+                    % sheet
                 )
 
     def has_all_keys(self, yml_class, keys):

@@ -54,18 +54,6 @@ def validate(config, worksheet):
     errors = []
     columns_to_validate = config.get("validations").get("columns")
     must_have_columns = config.get("must_have_columns")
-    if not set(must_have_columns).issubset(set(columns_to_validate.keys())):
-        raise Exception(
-            {
-                "Sheet": worksheet.title,
-                "Error": "Sheet {sheet} must have column(s) {missing_columns}".format(
-                    sheet=worksheet.title,
-                    missing_columns=", ".join(
-                        list(set(must_have_columns) - set(columns_to_validate.keys()))
-                    ),
-                ),
-            }
-        )
     # ********************** COLUMN_CASES ******************* #
     column_letter_to_header = {}
     for row in worksheet.iter_rows(max_row=1):
@@ -73,6 +61,21 @@ def validate(config, worksheet):
             if cell.value:
                 column_letter_to_header[cell.column_letter] = cell.value
     # ********************** COLUMN_CASES ******************* #
+    if not set(must_have_columns).issubset(set(column_letter_to_header.values())):
+        raise Exception(
+            {
+                "Sheet": worksheet.title,
+                "Error": "Sheet {sheet} must have column(s) {missing_columns}".format(
+                    sheet=worksheet.title,
+                    missing_columns=", ".join(
+                        list(
+                            set(must_have_columns)
+                            - set(column_letter_to_header.values())
+                        )
+                    ),
+                ),
+            }
+        )
     start_row = 1
     if config.get("iterate_by_header_name"):
         start_row = 2

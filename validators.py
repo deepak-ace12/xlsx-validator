@@ -105,8 +105,13 @@ class RegexValidator(BaseValidator):
     def validate(self, value):
         if value:
             value = super(RegexValidator, self).validate(value)
-            if not re.match(self.pattern, value):
-                raise Exception(self.error_msg)
+            value = value.replace("\\\\", "\\")
+            if self.full_match:
+                if not re.fullmatch(self.pattern, value):
+                    raise Exception(self.error_msg)
+                else:
+                    if not re.match(self.pattern, value):
+                        raise Exception(self.error_msg)
 
 
 class TypeValidator(BaseValidator):

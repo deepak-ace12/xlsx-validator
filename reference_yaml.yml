@@ -13,6 +13,7 @@ Required:
 Regex:
   - pattern
   - error_msg
+  - full_match
 
 Length:
   - operation

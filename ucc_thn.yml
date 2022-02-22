@@ -6,6 +6,7 @@ regex: &regex
   Regex:
     #regex for alphanumeric value
     pattern: "^[a-zA-Z0-9_]+$"
+    full_match: true
     error_msg: Cell value do not match the pattern.
   <<: *required
 
@@ -98,6 +99,7 @@ not_negative: &not_negative
 
 sheets:     # names of the sheets of the file
   - Example
+  - Students
 
 
 # CASE: 1 - if column names are fixed but their positions are not,
@@ -173,3 +175,25 @@ Example:
 
       Username:
         - <<: *regex
+
+Students:
+  excludes: []        # these columns will not be validated
+
+  iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+
+  must_have_columns:
+    - Roll No
+    - Batch
+
+  validations:
+    default:
+      - <<: *required
+
+    columns:
+      Name:
+        - <<: *regex
+          Regex:
+          #regex for alphabets which can have .(dot)
+            pattern: "[a-zA-Z\\.?\\ ]+$" # use two backward slash \\ for single \
+            full_match: true
+            error_msg: Cell value does not have a valid name.

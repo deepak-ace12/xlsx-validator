@@ -43,7 +43,8 @@ sheets:     # names of the sheets of the file
 Sales:
   excludes: [] # these columns will not be validated
   iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
-  
+  must_have_columns:
+    - Sales
   validations:
 
     # default validator works for columns for which no validation is defined.
