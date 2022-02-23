@@ -35,7 +35,7 @@ def is_valid_cell(valdn_type, value, coordinates, errors):
         try:
             validator.validate(value)
         except Exception as ex:
-            coordinates["Error"] = ex.args[0]
+            coordinates["error"] = ex.args[0]
             if coordinates not in errors:
                 errors.append(coordinates)
 
@@ -64,8 +64,8 @@ def validate(config, worksheet):
     if not set(must_have_columns).issubset(set(column_letter_to_header.values())):
         raise Exception(
             {
-                "Sheet": worksheet.title,
-                "Error": "Sheet {sheet} must have column(s) {missing_columns}".format(
+                "sheet": worksheet.title,
+                "error": "Sheet {sheet} must have column(s) {missing_columns}".format(
                     sheet=worksheet.title,
                     missing_columns=", ".join(
                         list(
@@ -86,9 +86,9 @@ def validate(config, worksheet):
         for cell in row:
             column_header = column_letter_to_header[cell.column_letter]
             coordinates = {
-                "Sheet": worksheet.title,
-                "Header": column_header,
-                "Cell": cell.coordinate,
+                "sheet": worksheet.title,
+                "header": column_header,
+                "cell": cell.coordinate,
             }
             if column_header in config.get("exclude", []):
                 continue
@@ -118,7 +118,7 @@ def validate_excel(xlsx_filepath, yaml_filepath):
                 worksheet = workbook[sheet]
                 validate(config, worksheet)
     except Exception as e:
-        sys.exit("Error occured: " + str(e))
+        sys.exit(e.args[0])
 
 
 if __name__ == "__main__":
