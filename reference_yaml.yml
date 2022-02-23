@@ -7,50 +7,50 @@
 #   - must have field n
 
 
-Required:
+RequiredValidator:
   - error_msg
 
-Regex:
+RegexValidator:
   - pattern
   - error_msg
   - full_match
 
-Length:
+LengthValidator:
   - operation
   - threshold
   - error_msg
   - trim
 
-Option:
+OptionValidator:
   - options
   - error_msg
   - case_sensitive
 
-Email:
+EmailValidator:
   - error_msg
   - trim
 
-Type:
+TypeValidator:
   - type
   - error_msg
 
-Datetime:
+DatetimeValidator:
   - format
   - error_msg
 
-Date:
+DateValidator:
   - format
   - error_msg
 
-ExcelDate:
+ExcelDateValidator:
   - error_msg
 
-Comparator:
+ComparatorValidator:
   - operation
   - threshold
   - error_msg
 
-NonNegative:
+NonNegativeValidator:
   - type
   - error_msg
 

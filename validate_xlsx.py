@@ -1,57 +1,39 @@
+from email import header
 import sys
 import yaml
+import copy
 from openpyxl.reader.excel import load_workbook
-from validators import (
-    RequiredValidator,
-    TypeValidator,
-    LengthValidator,
-    RegexValidator,
-    EmailValidator,
-    OptionValidator,
-    DateTimeValidator,
-    ExcelDateValidator,
-    NonNegativeValidator,
-    ComparatorValidator,
-)
+from validators import *
 
+ERRORS= []
 
-def is_valid_cell(valdn_type, value, coordinates, errors):
-    classmap = {
-        "Required": RequiredValidator,
-        "Type": TypeValidator,
-        "Length": LengthValidator,
-        "Regex": RegexValidator,
-        "Email": EmailValidator,
-        "Option": OptionValidator,
-        "Date": DateTimeValidator,
-        "ExcelDate": ExcelDateValidator,
-        "Comparator": ComparatorValidator,
-        "NonNegative": NonNegativeValidator,
-        "Datetime": DateTimeValidator,
-    }
-
+def is_valid_cell(valdn_type, cell, sheet, column_header):
     for typ, data in valdn_type.items():
-        validator = classmap[typ](data)  # creating the object with the parameters
+        metadata = {
+            "sheet": sheet,
+            "header": column_header,
+            "cell": cell.coordinate,
+        }
+        validating_class = getattr(sys.modules[__name__], typ)
+        validator = validating_class(data)  # creating the object with the parameters
         try:
-            validator.validate(value)
+            validator.validate(cell.value)
         except Exception as ex:
-            coordinates["error"] = ex.args[0]
-            if coordinates not in errors:
-                errors.append(coordinates)
+            metadata["error"] = ex.args[0]
+            ERRORS.append(metadata)
 
 
-def set_config(yaml_config, yaml_validator_cls):
+def set_config(yaml_config):
     """
     Takes the config yaml file and converts it into a dictionary.
     """
     with open(yaml_config, "r") as yml:
-        config = yaml.safe_load(yml).get(yaml_validator_cls)
+        config = yaml.safe_load(yml)
         # config["default"] = config.get("validations").get("default")[0] or None
         return config
 
 
 def validate(config, worksheet):
-    errors = []
     columns_to_validate = config.get("validations").get("columns")
     must_have_columns = config.get("must_have_columns")
     # ********************** COLUMN_CASES ******************* #
@@ -82,41 +64,55 @@ def validate(config, worksheet):
     else:
         for key, _ in column_letter_to_header.items():
             column_letter_to_header[key] = key
-    for row in worksheet.iter_rows(min_row=start_row, max_col=worksheet.max_column):
+    for row in worksheet.iter_rows(min_row=start_row, max_col=len(column_letter_to_header.keys())):
         for cell in row:
             column_header = column_letter_to_header[cell.column_letter]
-            coordinates = {
-                "sheet": worksheet.title,
-                "header": column_header,
-                "cell": cell.coordinate,
-            }
             if column_header in config.get("exclude", []):
                 continue
             if column_header in columns_to_validate:
                 for valdn_type in columns_to_validate[column_header]:
-                    is_valid_cell(valdn_type, cell.value, coordinates, errors)
+                    is_valid_cell(
+                        valdn_type=valdn_type,
+                        cell=cell,
+                        sheet=worksheet.title,
+                        column_header=column_header
+                    )
 
             elif config.get("validations").get("default"):
                 is_valid_cell(
-                    config.get("validations").get("default")[0],
-                    cell.value,
-                    coordinates,
-                    errors,
+                    valdn_type=config.get("validations").get("default")[0],
+                    cell=cell,
+                    sheet=worksheet.title,
+                    column_header=column_header
                 )
 
-    for error in errors:
+    for error in ERRORS:
         print(error)  # TODO: do something about error logging
 
 
 def validate_excel(xlsx_filepath, yaml_filepath):
     try:
-        workbook = load_workbook(xlsx_filepath, read_only=True)
+        workbook = load_workbook(xlsx_filepath)
         sheets = workbook.sheetnames
+        config = set_config(yaml_filepath)
+        config_sheets = config.get("sheets")
+        if not set(config_sheets).issubset(set(sheets)):
+            raise Exception(
+            {
+                "error": "The uploaded file must have sheet(s) {missing_sheets}".format(
+                    missing_sheets=", ".join(
+                        list(
+                            set(config_sheets)
+                            - set(sheets)
+                        )
+                    ),
+                ),
+            }
+        )
         for sheet in sheets:
-            config = set_config(yaml_filepath, sheet)
-            if config:
+            if config.get(sheet):
                 worksheet = workbook[sheet]
-                validate(config, worksheet)
+                validate(config.get(sheet), worksheet)
     except Exception as e:
         sys.exit(e.args[0])
 
@@ -125,7 +121,7 @@ if __name__ == "__main__":
     import time
 
     t1 = time.time()
-    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/sample.xlsx"
+    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/sample_1.xlsx"
     yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/ucc_thn.yml"
     validate_excel(xlsx_filepath, yaml_filepath)
     t2 = time.time()

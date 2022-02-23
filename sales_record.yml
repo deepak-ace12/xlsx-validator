@@ -1,9 +1,9 @@
 required: &required
-  Required:
+  RequiredValidator:
     error_msg: Cell Value can not be blank.
 
 options: &options
-  Option:
+  OptionValidator:
     options:
       - Online
       - Offline
@@ -12,19 +12,19 @@ options: &options
   <<: *required
 
 premitive_float: &premitive_float
-  Type:
+  TypeValidator:
     type: float
     error_msg: Cell value must be a decimal value.
   <<: *required
 
 date: &date
-  Date:
+  DateTimeValidator:
     format: "%m/%d/%Y"
     error_msg: Date format must be mm/dd/yyyy.
   <<: *required
 
 not_negative: &not_negative
-  NonNegative:
+  NonNegativeValidator:
     type: int
     error_msg: Cell value must be a non negative value.
   <<: *required
@@ -41,10 +41,10 @@ sheets:     # names of the sheets of the file
 # look for COLUMN_CASES comment in validate_xlsx.py file
 
 Sales:
-  excludes: [] # these columns will not be validated
+  exclude: [] # these columns will not be validated
   iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
   must_have_columns:
-    - Sales
+    - Sales Channel
   validations:
 
     # default validator works for columns for which no validation is defined.
@@ -60,7 +60,7 @@ Sales:
       
       Order Priority:
         - <<: *options
-          Option:
+          OptionValidator:
             options: [C, H, L, M]
             case_sensitive: false
             error_msg: Invalid option.

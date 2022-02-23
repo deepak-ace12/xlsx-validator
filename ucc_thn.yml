@@ -1,9 +1,9 @@
 required: &required
-  Required:
+  RequiredValidator:
     error_msg: Cell Value can not be blank.
 
 regex: &regex
-  Regex:
+  RegexValidator:
     #regex for alphanumeric value
     pattern: "^[a-zA-Z0-9_]+$"
     full_match: true
@@ -11,7 +11,7 @@ regex: &regex
   <<: *required
 
 max_length: &max_length
-  Length:
+  LengthValidator:
     operation: max
     threshold: 30
     error_msg: Cell value is too long in length.
@@ -19,7 +19,7 @@ max_length: &max_length
   <<: *required
 
 min_length: &min_length
-  Length:
+  LengthValidator:
     operation: min
     threshold: 3
     error_msg: Cell value is too short in length.
@@ -27,44 +27,44 @@ min_length: &min_length
   <<: *required
 
 options: &options
-  Option:
+  OptionValidator:
     options: [Male, Female]
     error_msg: Cell value must be a valid option.
     case_sensitive: false
   <<: *required
 
 email: &email
-  Email:
+  EmailValidator:
     error_msg: Cell has an invalid email address.
     trim: true
   <<: *required
 
 premitive_int: &premitive_int
-  Type:
+  TypeValidator:
     type: int
     error_msg: Cell value must be a whole number.
   <<: *required
 
 premitive_float: &premitive_float
-  Type:
+  TypeValidator:
     type: float
     error_msg: Cell value must be a decimal value.
   <<: *required
 
 premitive_bool: &premitive_bool
-  Type:
+  TypeValidator:
     type: bool
     error_msg: Cell value must be a boolean value i.e. true, false, 0, 1.
   <<: *required
 
 datetime: &datetime
-  Datetime:
+  DateTimeValidator:
     format: "%d-%m-%Y %H:%M:%S"
     error_msg: Datetime format must be %d-%m-%Y %H:%M:%S
   <<: *required
 
 date: &date
-  Date:
+  DateTimeValidator:
     format: "%Y-%m-%d"
     error_msg: Date format must be yyyy-mm-dd.
   <<: *required
@@ -72,26 +72,26 @@ date: &date
 excel_date: &excel_date
   # sometimes dates in excel are stored as number, e.g.
   # 42029 is 25/1/2015 and 42029.59236 is 2015-01-25 14:12:59
-  ExcelDate:
+  ExcelDateValidator:
     error_msg: Value must be an excel date number.
   <<: *required
 
 comparator_gt: &comparator_gt
-  Comparator:
+  ComparatorValidator:
     operation: "gt"
     threshold: 10
     error_msg: Cell value should not be greater than 10.
   <<: *required
 
 comparator_lt: &comparator_lt
-  Comparator:
+  ComparatorValidator:
     operation: "lt"
     threshold: 0
     error_msg: Cell value should not be less than 0.
   <<: *required
 
 not_negative: &not_negative
-  NonNegative:
+  NonNegativeValidator:
     type: int
     error_msg: Cell value must be a non negative value.
   <<: *required
@@ -100,7 +100,6 @@ not_negative: &not_negative
 sheets:     # names of the sheets of the file that need validation
   - Example
   - Students
-
 
 # CASE: 1 - if column names are fixed but their positions are not,
 # create the yaml file with column names
@@ -134,10 +133,11 @@ Example:  # Sheet Name
     columns:
       ID:
         - <<: *not_negative
+        - <<: *comparator_lt
 
       Title:
         - <<: *options
-          Option:
+          OptionValidator:
             options: [Ms., Mr., Mrs.]
             case_sensitive: false
             error_msg: Invalid option.
@@ -193,7 +193,7 @@ Students: # Sheet Name
     columns:
       Name:
         - <<: *regex
-          Regex:
+          RegexValidator:
           #regex for alphabets which can have .(dot)
             pattern: "[a-zA-Z\\.?\\ ]+$" # use two backward slash \\ for single \
             full_match: true

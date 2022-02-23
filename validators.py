@@ -137,9 +137,10 @@ class ComparatorValidator(BaseValidator):
     def validate(self, value):
         if value:
             value = str(value)
-            if not str(value).replace(".", "").isdigit():
+            if not str(value).replace(".", "").replace("-", "").isdigit():
                 raise Exception("Cell value must be a number.")
             if self.operation == "gt" and eval(value) >= self.threshold:
                 raise Exception(self.error_msg)
             if self.operation == "lt" and eval(value) <= self.threshold:
                 raise Exception(self.error_msg)
+
