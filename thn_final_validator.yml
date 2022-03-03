@@ -1,0 +1,137 @@
+required: &required
+  RequiredValidator:
+    error_msg: Cell Value can not be blank.
+
+email: &email
+  EmailValidator:
+    error_msg: Cell has an invalid email address.
+    trim: true
+  <<: *required
+
+not_negative: &not_negative
+  NonNegativeValidator:
+    type: int
+    error_msg: Cell value must be a non negative value.
+  <<: *required
+
+name_string: &name_string
+  RegexValidator:
+    pattern: "[a-zA-Z\\.?\\ ]+$" # use two backward slash \\ for single \
+    full_match: true
+    error_msg: Cell value does not have a valid name.
+  <<: *required
+
+numbers_only: &numbers_only
+  RegexValidator:
+    pattern: "^[0-9]+$" # use two backward slash \\ for single \
+    full_match: true
+    error_msg: Cell value must be a number.
+  <<: *required
+
+max_length: &max_length
+  LengthValidator:
+    operation: max
+    threshold: 12
+    error_msg: Cell value is too long in length.
+    trim: true
+  <<: *required
+
+min_length: &min_length
+  LengthValidator:
+    operation: min
+    threshold: 9
+    error_msg: Cell value is too short in length.
+    trim: false
+  <<: *required
+
+sheets:
+  - Patients
+  - Care Team
+  - Care Team Members
+
+Patients:  # Sheet Name
+  exclude:         # these columns will not be validated
+    - "Gender"
+    - "DOB"
+
+  iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+
+  must_have_columns:
+    - EMPI
+    - First Name
+    - Last Name
+    - Phone Number
+    - Care Team ID
+    - Assigned UHC
+  
+  read_as_string:
+    - Phone Number
+
+  validations:
+
+    # default validator works for columns for which no validation is defined.
+    # default validator does not work for excluded columns.
+    # remove this class if you don't want to set default validator
+    
+    columns:
+      First Name:
+        - <<: *name_string
+
+      Last Name:
+        - <<: *name_string
+
+      Phone Number:
+        - <<: *numbers_only
+        - <<: *min_length
+        - <<: *max_length
+      
+      Assigned UHC:
+        - <<: *email
+      
+
+Care Team: 
+  exclude:
+    - "PTM Id"
+    - "User type"
+
+  iterate_by_header_name: true
+
+  must_have_columns:
+    - Care Team ID
+
+  validations: 
+    columns:
+
+      Care Team ID:
+        - <<: *required
+
+
+Care Team Members:
+  exclude:
+    - "User Type"
+  
+  iterate_by_header_name: true
+  
+  read_as_string:
+    - Phone Number
+  
+  must_have_columns:
+    - Care Team ID
+    - Care Team Member Id
+    - Name
+    - Phone Number
+  
+  validations:
+    
+    columns:
+      Care Team Member Id:
+        - <<: *email
+      
+      Name:
+        - <<: *name_string
+      
+      Phone Number:
+        - <<: *numbers_only
+        - <<: *min_length
+        - <<: *max_length
+
