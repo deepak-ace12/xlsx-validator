@@ -1,26 +1,27 @@
 from email import header
-import sys
+from optparse import Values
 import yaml
+import sys
 import copy
+from collections import defaultdict
 from openpyxl.reader.excel import load_workbook
 from validators import *
 
-ERRORS= []
+ERRORS = defaultdict(list)
 
 def is_valid_cell(valdn_type, cell, sheet, column_header):
     for typ, data in valdn_type.items():
         metadata = {
-            "sheet": sheet,
             "header": column_header,
             "cell": cell.coordinate,
         }
-        validating_class = getattr(sys.modules[__name__], typ)
-        validator = validating_class(data)  # creating the object with the parameters
+        validating_class = eval(typ) #getattr(sys.modules[__name__], typ)
+        validator = validating_class(data)
         try:
             validator.validate(cell.value)
         except Exception as ex:
             metadata["error"] = ex.args[0]
-            ERRORS.append(metadata)
+            ERRORS[sheet].append(metadata)
 
 
 def set_config(yaml_config):
@@ -29,12 +30,11 @@ def set_config(yaml_config):
     """
     with open(yaml_config, "r") as yml:
         config = yaml.safe_load(yml)
-        # config["default"] = config.get("validations").get("default")[0] or None
         return config
 
 
 def validate(config, worksheet):
-    columns_to_validate = config.get("validations").get("columns")
+    columns_to_validate = config.get("validations").get("columns") or []
     must_have_columns = config.get("must_have_columns")
     # ********************** COLUMN_CASES ******************* #
     column_letter_to_header = {}
@@ -65,32 +65,37 @@ def validate(config, worksheet):
         for key, _ in column_letter_to_header.items():
             column_letter_to_header[key] = key
     for row in worksheet.iter_rows(min_row=start_row, max_col=len(column_letter_to_header.keys())):
-        for cell in row:
-            column_header = column_letter_to_header[cell.column_letter]
-            if column_header in config.get("exclude", []):
-                continue
-            if column_header in columns_to_validate:
-                for valdn_type in columns_to_validate[column_header]:
+        if not all([cell.value is None for cell in row]):
+            for cell in row:
+                column_header = column_letter_to_header[cell.column_letter]
+                if column_header in config.get("read_as_string", []):
+                    cell.value = str(cell.value)
+                if column_header in config.get("read_as_int", []):
+                    cell.value = int(cell.value)
+                if column_header in config.get("exclude", []):
+                    continue
+                if column_header in columns_to_validate:
+                    for valdn_type in columns_to_validate[column_header]:
+                        is_valid_cell(
+                            valdn_type=valdn_type,
+                            cell=cell,
+                            sheet=worksheet.title,
+                            column_header=column_header
+                        )
+
+                elif config.get("validations").get("default"):
                     is_valid_cell(
-                        valdn_type=valdn_type,
+                        valdn_type=config.get("validations").get("default")[0],
                         cell=cell,
                         sheet=worksheet.title,
                         column_header=column_header
                     )
 
-            elif config.get("validations").get("default"):
-                is_valid_cell(
-                    valdn_type=config.get("validations").get("default")[0],
-                    cell=cell,
-                    sheet=worksheet.title,
-                    column_header=column_header
-                )
-
-    for error in ERRORS:
-        print(error)  # TODO: do something about error logging
-
+    # for error in ERRORS:
+    #     print(error)  # TODO: do something about error logging
 
 def validate_excel(xlsx_filepath, yaml_filepath):
+
     try:
         workbook = load_workbook(xlsx_filepath)
         sheets = workbook.sheetnames
@@ -115,14 +120,15 @@ def validate_excel(xlsx_filepath, yaml_filepath):
                 validate(config.get(sheet), worksheet)
     except Exception as e:
         sys.exit(e.args[0])
+    
+    print(ERRORS)
 
 
 if __name__ == "__main__":
     import time
-
     t1 = time.time()
-    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/sample_1.xlsx"
-    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/ucc_thn.yml"
+    xlsx_filepath = "/Users/I1597/Downloads/ucc_data_columns_final.xlsx"
+    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/thn_final_validator.yml"
     validate_excel(xlsx_filepath, yaml_filepath)
     t2 = time.time()
     print("Total Time", (t2 - t1))

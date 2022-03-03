@@ -31,26 +31,23 @@ class YamlValidator:
                     )
                 )
             columns = sheet_data.get("validations").get("columns")
-            if not columns:
-                validation_errors.append(
-                    f"Sheet {sheet} validation's class must have the list of columns"
-                )
+            if columns:
 
-            for column_name, validations in columns.items():
-                for valdn_type in validations:
-                    for class_name, validation in valdn_type.items():
-                        is_valid, missing_keys = self.has_all_keys(
-                            class_name, validation.keys()
-                        )
-                        if not is_valid:
-                            validation_errors.append(
-                                "{sheet} sheet {column_name} column's {class_name} class is missing {missing_keys}".format(
-                                    sheet=sheet,
-                                    column_name=column_name,
-                                    class_name=class_name,
-                                    missing_keys=", ".join(missing_keys),
-                                )
+                for column_name, validations in columns.items():
+                    for valdn_type in validations:
+                        for class_name, validation in valdn_type.items():
+                            is_valid, missing_keys = self.has_all_keys(
+                                class_name, validation.keys()
                             )
+                            if not is_valid:
+                                validation_errors.append(
+                                    "{sheet} sheet {column_name} column's {class_name} class is missing {missing_keys}".format(
+                                        sheet=sheet,
+                                        column_name=column_name,
+                                        class_name=class_name,
+                                        missing_keys=", ".join(missing_keys),
+                                    )
+                                )
             if validation_errors:
                 for error in validation_errors:
                     print(error)
