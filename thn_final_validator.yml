@@ -98,6 +98,9 @@ Care Team:
 
   must_have_columns:
     - Care Team ID
+  
+  read_as_string:
+    - CPP Phone
 
   validations: 
     columns:

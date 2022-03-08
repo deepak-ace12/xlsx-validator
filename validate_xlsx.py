@@ -5,9 +5,30 @@ import sys
 import copy
 from collections import defaultdict
 from openpyxl.reader.excel import load_workbook
-from validators import *
+from validators_pd import *
 
 ERRORS = defaultdict(list)
+
+rv = RequiredValidator()
+ov = OptionValidator()
+tv = TypeValidator()
+dtv = DateTimeValidator()
+nnv = NonNegativeValidator()
+ev = EmailValidator()
+rgv = RegexValidator()
+lv = LengthValidator()
+
+
+v_obj = {
+    "RequiredValidator": rv,
+    "OptionValidator": ov,
+    "TypeValidator": tv,
+    "DateTimeValidator": dtv,
+    "NonNegativeValidator": nnv,
+    "RegexValidator": rgv,
+    "EmailValidator": ev,
+    "LengthValidator": lv
+}
 
 def is_valid_cell(valdn_type, cell, sheet, column_header):
     for typ, data in valdn_type.items():
@@ -15,10 +36,10 @@ def is_valid_cell(valdn_type, cell, sheet, column_header):
             "header": column_header,
             "cell": cell.coordinate,
         }
-        validating_class = eval(typ) #getattr(sys.modules[__name__], typ)
-        validator = validating_class(data)
+        # validating_class = eval(typ) #getattr(sys.modules[__name__], typ)
+        validator = v_obj.get(typ)
         try:
-            validator.validate(cell.value)
+            validator.validate(cell.value, data)
         except Exception as ex:
             metadata["error"] = ex.args[0]
             ERRORS[sheet].append(metadata)
@@ -97,10 +118,14 @@ def validate(config, worksheet):
 def validate_excel(xlsx_filepath, yaml_filepath):
 
     try:
+        import time
+        t1 = time.time()
         workbook = load_workbook(xlsx_filepath)
         sheets = workbook.sheetnames
         config = set_config(yaml_filepath)
         config_sheets = config.get("sheets")
+        t2 = time.time()
+        print("loading", (t2-t1))
         if not set(config_sheets).issubset(set(sheets)):
             raise Exception(
             {
@@ -116,8 +141,13 @@ def validate_excel(xlsx_filepath, yaml_filepath):
         )
         for sheet in sheets:
             if config.get(sheet):
+                t11 = time.time()
                 worksheet = workbook[sheet]
+                t22 = time.time()
+                print("sheet", (t22-t11))
                 validate(config.get(sheet), worksheet)
+                t33 = time.time()
+                print("vals", (t33-t22))
     except Exception as e:
         sys.exit(e.args[0])
     
@@ -127,8 +157,11 @@ def validate_excel(xlsx_filepath, yaml_filepath):
 if __name__ == "__main__":
     import time
     t1 = time.time()
-    xlsx_filepath = "/Users/I1597/Downloads/ucc_data_columns_final.xlsx"
-    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/thn_final_validator.yml"
+    # xlsx_filepath = "/Users/I1597/Downloads/ucc_data_columns_final.xlsx"
+    # yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/thn_final_validator.yml"
+    xlsx_filepath = "/Users/I1597/Documents/repositories/excel_validator/one_lakh_record.xlsx"
+    yaml_filepath = "/Users/I1597/Documents/repositories/excel_validator/sales_record.yml"
+
     validate_excel(xlsx_filepath, yaml_filepath)
     t2 = time.time()
     print("Total Time", (t2 - t1))

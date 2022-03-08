@@ -32,8 +32,6 @@ not_negative: &not_negative
 
 sheets:     # names of the sheets of the file
   - Sales
-
-
 # CASE: 1 - if column names are fixed but their positions are not,
 # create the yaml file with column names
 # CASE: 2 - if column names are not fixed but the position of the columns are,
@@ -41,6 +39,57 @@ sheets:     # names of the sheets of the file
 # look for COLUMN_CASES comment in validate_xlsx.py file
 
 Sales:
+  exclude: [] # these columns will not be validated
+  iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+  must_have_columns:
+    - Sales Channel
+  validations:
+
+    # default validator works for columns for which no validation is defined.
+    # default validator does not work for excluded columns.
+    # remove this class if you don't want to set default validator
+
+    default:
+      - <<: *required
+
+    columns:
+      Sales Channel:
+        - <<: *options
+      
+      Order Priority:
+        - <<: *options
+          OptionValidator:
+            options: [C, H, L, M]
+            case_sensitive: false
+            error_msg: Invalid option.
+      
+      Order Date:
+        - <<: *date
+      
+      Units Sold:
+        - <<: *not_negative
+      
+      Unit Price:
+        - <<: *premitive_float
+        - <<: *not_negative
+
+      Unit Cost:
+        - <<: *premitive_float
+        - <<: *not_negative
+      
+      Total Revenue:
+        - <<: *premitive_float
+        - <<: *not_negative
+      
+      Total Cost:
+        - <<: *premitive_float
+        - <<: *not_negative
+      
+      Total Profit:
+        - <<: *premitive_float      
+
+
+Sales2:
   exclude: [] # these columns will not be validated
   iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
   must_have_columns:
