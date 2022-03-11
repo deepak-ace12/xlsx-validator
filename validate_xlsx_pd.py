@@ -20,6 +20,8 @@ validating_objects = {
 
 
 def is_valid_cell(values, validations, sheet, header, column_letter):
+    if header == "Phone Number":
+        import ipdb; ipdb.set_trace()
     index = 1
     for value in values:
         index += 1

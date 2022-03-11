@@ -79,6 +79,7 @@ Patients:  # Sheet Name
         - <<: *name_string
 
       Phone Number:
+        unique: true
         - <<: *numbers_only
         - <<: *min_length
         - <<: *max_length
