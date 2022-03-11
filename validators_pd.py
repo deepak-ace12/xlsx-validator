@@ -1,7 +1,8 @@
 import re
-from datetime import datetime
-from openpyxl.utils.datetime import from_excel
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
+
+from openpyxl.utils.datetime import from_excel
 
 
 class BaseValidator:
@@ -36,6 +37,7 @@ class BaseValidator:
     def __init__(self):
         pass
 
+
 class OptionValidator(BaseValidator):
     def validate(self, value, params):
         if value:
@@ -55,7 +57,7 @@ class DateTimeValidator(BaseValidator):
             if type(value) is datetime:  # For Date Only
                 try:
                     value = value.strftime(self.format)
-                except Exception as ex:
+                except Exception:
                     raise Exception(self.error_msg)
             try:
                 datetime.strptime(value, self.format)
@@ -81,7 +83,7 @@ class ExcelDateValidator(BaseValidator):
                     from_excel(int(value))
                 else:
                     from_excel(float(value))
-            except Exception as ex:
+            except Exception:
                 raise Exception(self.error_msg)
 
 
@@ -122,7 +124,7 @@ class TypeValidator(BaseValidator):
             value = super(TypeValidator, self).validate(value, params)
             try:
                 string_to_func[self.type](value)
-            except Exception as ex:
+            except Exception:
                 raise Exception(self.error_msg)
 
 
@@ -145,4 +147,3 @@ class ComparatorValidator(BaseValidator):
                 raise Exception(self.error_msg)
             if self.operation == "lt" and eval(value) < self.threshold:
                 raise Exception(self.error_msg)
-

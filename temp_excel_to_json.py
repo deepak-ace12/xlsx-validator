@@ -62,15 +62,15 @@ print()
 
 
 def get_parsed_file_data(self, sheets):
-        sheet_data = {}
-        numeric_to_str = [
-            "Phone Number",
-            "CPP Phone",
-        ]
-        for sheet in sheets:
-            for column in numeric_to_str:
-                if sheet.get(column):
-                    sheet = sheet.apply(lambda x: str(x))
-            sheet_dict = sheet.to_dict(orient="records")
-            sheet_data[sheet] = sheet_dict
-        return sheet_data
+    sheet_data = {}
+    numeric_to_str = [
+        "Phone Number",
+        "CPP Phone",
+    ]
+    for sheet in sheets:
+        for column in numeric_to_str:
+            if sheet.get(column):
+                sheet = sheet.apply(lambda x: str(x))
+        sheet_dict = sheet.to_dict(orient="records")
+        sheet_data[sheet] = sheet_dict
+    return sheet_data
