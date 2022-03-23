@@ -44,6 +44,7 @@ min_length: &min_length
     trim: false
   <<: *required
 
+
 sheets:
   - Patients
   - Care Team
@@ -53,6 +54,7 @@ Patients:  # Sheet Name
   exclude:         # these columns will not be validated
     - "Gender"
     - "DOB"
+    - Assigned UHC
 
   must_have_columns:
     - EMPI
@@ -60,16 +62,20 @@ Patients:  # Sheet Name
     - Last Name
     - Phone Number
     - Care Team ID
-    - Assigned UHC
 
   read_as_string:
     - Phone Number
+  
+  # unique_columns:   # columns which should have unique values
+  #   - Phone Number
 
   validations:
 
     # default validator works for columns for which no validation is defined.
     # default validator does not work for excluded columns.
     # remove this class if you don't want to set default validator
+    # default:
+    #   - <<: *required
 
     columns:
       First Name:
@@ -79,10 +85,7 @@ Patients:  # Sheet Name
         - <<: *name_string
 
       Phone Number:
-        unique: true
         - <<: *numbers_only
-        - <<: *min_length
-        - <<: *max_length
 
       Assigned UHC:
         - <<: *email

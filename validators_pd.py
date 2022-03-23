@@ -1,9 +1,7 @@
 import re
 from abc import ABCMeta, abstractmethod
+from ast import literal_eval
 from datetime import datetime
-
-from openpyxl.utils.datetime import from_excel
-
 
 class BaseValidator:
     __metaclass__ = ABCMeta
@@ -69,21 +67,8 @@ class EmailValidator(BaseValidator):
     def validate(self, value, params):
         if value:
             value = super(EmailValidator, self).validate(value, params)
-            regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-            if not re.fullmatch(regex, value):
-                raise Exception(self.error_msg)
-
-
-class ExcelDateValidator(BaseValidator):
-    def validate(self, value, params):
-        if value:
-            value = super(ExcelDateValidator, self).validate(value, params)
-            try:
-                if str(value).isdigit():
-                    from_excel(int(value))
-                else:
-                    from_excel(float(value))
-            except Exception:
+            self.pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+            if not re.fullmatch(self.pattern, value):
                 raise Exception(self.error_msg)
 
 
@@ -112,9 +97,9 @@ class RegexValidator(BaseValidator):
             if self.full_match:
                 if not re.fullmatch(self.pattern, value):
                     raise Exception(self.error_msg)
-                else:
-                    if not re.match(self.pattern, value):
-                        raise Exception(self.error_msg)
+            else:
+                if not re.match(self.pattern, value):
+                    raise Exception(self.error_msg)
 
 
 class TypeValidator(BaseValidator):
@@ -143,7 +128,7 @@ class ComparatorValidator(BaseValidator):
             value = str(value)
             if not str(value).replace(".", "").replace("-", "").isdigit():
                 raise Exception("Cell value must be a number.")
-            if self.operation == "gt" and eval(value) > self.threshold:
+            if self.operation == "gt" and literal_eval(value) > self.threshold:
                 raise Exception(self.error_msg)
-            if self.operation == "lt" and eval(value) < self.threshold:
+            if self.operation == "lt" and literal_eval(value) < self.threshold:
                 raise Exception(self.error_msg)

@@ -1,26 +1,77 @@
 required: &required
   RequiredValidator:
-    error_msg: Cell Value can not be blank.
+    error_msg: Cell Value can not be blank
 
-options: &options
+sales_channel: &sales_channel
   OptionValidator:
     options:
       - Online
       - Offline
-    error_msg: Cell value must be a valid option.
+    error_msg: Cell value must be a valid sales channel
     case_sensitive: false
   <<: *required
 
-premitive_float: &premitive_float
-  TypeValidator:
-    type: float
-    error_msg: Cell value must be a decimal value.
+order_priority: &order_priority
+  OptionValidator:
+    options:
+      - C
+      - H
+      - L
+      - M
+    error_msg: Cell value must be a valid sales channel
+    case_sensitive: false
   <<: *required
 
-date: &date
+decimal: &decimal
+  TypeValidator:
+    type: float
+    error_msg: Cell value must be a decimal value
+  <<: *required
+
+whole_number: &whole_number
+  TypeValidator:
+    type: int
+    error_msg: Cell value must be a decimal value
+  <<: *required
+
+usa_date_format: &usa_date_format
   DateTimeValidator:
     format: "%m/%d/%Y"
-    error_msg: Date format must be mm/dd/yyyy.
+    error_msg: Date format must be mm/dd/yyyy
+  <<: *required
+
+date_format: &date_format
+  DateTimeValidator:
+    format: "%d/%m/%Y"
+    error_msg: Date format must be dd/mm/yyyy
+  <<: *required
+
+products: &products
+  OptionValidator:
+    options:
+      - Carretera
+      - Montana
+      - Paseo
+      - Velo
+      - VTT
+      - Amarilla
+    error_msg: Cell value must be a valid product
+    case_sensitive: false
+    trim: true
+  <<: *required
+
+alphabetic: &alphabetic
+  RegexValidator:
+    pattern: "[a-zA-Z\\.?\\ ]+$" # use two backward slash \\ for single \
+    full_match: true
+    error_msg: Cell value does not have a valid name
+  <<: *required
+
+digits_only: &digits_only   # can be used to validate long strings which should have integer values only like phone number
+  RegexValidator:
+    pattern: "^[0-9]+$" # use two backward slash \\ for single \
+    full_match: true
+    error_msg: Cell value must be a number
   <<: *required
 
 not_negative: &not_negative
@@ -29,22 +80,49 @@ not_negative: &not_negative
     error_msg: Cell value must be a non negative value.
   <<: *required
 
+email: &email
+  EmailValidator:
+    error_msg: Cell has an invalid email address
+    trim: true
+  <<: *required
+
+
+max_length: &max_length
+  LengthValidator:
+    operation: max
+    threshold: 15
+    error_msg: Cell value is too long in length
+    trim: true
+  <<: *required
+
+min_length: &min_length
+  LengthValidator:
+    operation: min
+    threshold: 9
+    error_msg: Cell value is too short in length
+    trim: false
+  <<: *required
 
 sheets:     # names of the sheets of the file
   - Sales
-  - SALES2
-# CASE: 1 - if column names are fixed but their positions are not,
-# create the yaml file with column names
-# CASE: 2 - if column names are not fixed but the position of the columns are,
-# create the yaml file with column letters i.e. A, B, C, etc.
-# look for COLUMN_CASES comment in validate_xlsx.py file
+  - Finance
+  - Customers
+
+########################### Sales Sheet ###########################
 
 Sales:
-  exclude: [] # these columns will not be validated
-  iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+  exclude:  # these columns will not be validated
+    - Region
+    - Country
+  
   must_have_columns:
     - Sales Channel
-    - ABC
+    - Order ID
+    - Total Profit
+  
+  read_as_string:           # columns that are integer or float but the size is too long to fit 
+    - Order ID
+  
   validations:
 
     # default validator works for columns for which no validation is defined.
@@ -56,88 +134,94 @@ Sales:
 
     columns:
       Sales Channel:
-        - <<: *options
+        - <<: *sales_channel
       
       Order Priority:
-        - <<: *options
-          OptionValidator:
-            options: [C, H, L, M]
-            case_sensitive: false
-            error_msg: Invalid option.
+        - <<: *order_priority
       
       Order Date:
-        - <<: *date
-      
-      Units Sold:
-        - <<: *not_negative
-      
-      Unit Price:
-        - <<: *premitive_float
-        - <<: *not_negative
+        - <<: *usa_date_format
 
-      Unit Cost:
-        - <<: *premitive_float
-        - <<: *not_negative
+      Ship Date:
+        - <<: *usa_date_format
+      
+      Order ID:
+        - <<: *digits_only
       
       Total Revenue:
-        - <<: *premitive_float
+        - <<: *decimal
         - <<: *not_negative
       
       Total Cost:
-        - <<: *premitive_float
+        - <<: *decimal
         - <<: *not_negative
       
       Total Profit:
-        - <<: *premitive_float      
+        - <<: *decimal
+ 
+########################### Finance Sheet ###########################
 
+Finance:
 
-Sales2:
-  exclude: [] # these columns will not be validated
-  iterate_by_header_name: true # if headers are not fixed, set it to false. Iteration will be done by column_letter.
+  exclude:
+    - Discounts
+    - Discount Band
+
   must_have_columns:
-    - Sales Channel
-    - ABC
-  validations:
+    - Segment
+    - Product
+    - Sales Team Contact
+  
+  unique_columns:   # Columns that should be unique
+      - Sales Team Contact
 
-    # default validator works for columns for which no validation is defined.
-    # default validator does not work for excluded columns.
-    # remove this class if you don't want to set default validator
+  read_as_string:           # columns that are integer or float but the size is too long to fit 
+    - Sales Team Contact   # and need to be read as string to apply validations like min_length max_length
+  
+  validations:
 
     default:
       - <<: *required
 
     columns:
-      Sales Channel:
-        - <<: *options
+      Product:
+        - <<: *products
       
-      Order Priority:
-        - <<: *options
-          OptionValidator:
-            options: [C, H, L, M]
-            case_sensitive: false
-            error_msg: Invalid option.
+      Manufacturing Price:
+        - <<: *not_negative
+
+      Sale Price:
+        - <<: *not_negative
       
-      Order Date:
-        - <<: *date
+      COGS:
+        - <<: *decimal
       
       Units Sold:
         - <<: *not_negative
+        - <<: *whole_number
       
-      Unit Price:
-        - <<: *premitive_float
-        - <<: *not_negative
+      Sales Team Contact:
+        - <<: *digits_only
+        - <<: *min_length
+        - <<: *max_length
 
-      Unit Cost:
-        - <<: *premitive_float
-        - <<: *not_negative
-      
-      Total Revenue:
-        - <<: *premitive_float
-        - <<: *not_negative
-      
-      Total Cost:
-        - <<: *premitive_float
-        - <<: *not_negative
-      
-      Total Profit:
-        - <<: *premitive_float      
+########################### Customers Sheet ###########################
+
+Customers:
+  exclude: [] # No columns to be excluded
+  
+  must_have_columns: [] # when you're uncertain of columns in the sheet don't put anything here
+  
+  unique_columns:
+    - Email
+  
+  validations:
+
+    # Run default validation for each column except for email
+
+    default:
+      - <<: *required
+
+    columns:
+      Email:
+        - <<: *email

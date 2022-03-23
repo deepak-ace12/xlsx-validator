@@ -7,6 +7,9 @@ from collections import defaultdict
 from openpyxl.reader.excel import load_workbook
 from validators_pd import *
 
+import os, psutil
+
+
 ERRORS = defaultdict(list)
 
 rv = RequiredValidator()
@@ -165,3 +168,6 @@ if __name__ == "__main__":
     validate_excel(xlsx_filepath, yaml_filepath)
     t2 = time.time()
     print("Total Time", (t2 - t1))
+print("RAM USED",(psutil.Process().memory_info().rss / 1024 ** 2) )
+print("HARD DISK USED", (psutil.Process().memory_info().vms / 1024 ** 2))
+print("CPU USED", psutil.cpu_percent(), "%")
