@@ -1,0 +1,13 @@
+Please fix the errors mentioned in the error file.
+
+
+The uploaded file must have sheet(s): NonExistingSheet
+
+   sheetName    type                                          errorMessage          header rowNumber cellLocation
+0      Sales  column  Sheet 'Sales' must have column(s): NonExistingColumn              NA        NA           NA
+1      Sales    cell              Cell value must be a valid sales channel  Order Priority       2.0           E2
+2      Sales    cell              Cell value must be a valid sales channel  Order Priority     870.0         E870
+3    Finance    cell              Cell value must be a non negative value.      Units Sold       2.0           G2
+4    Finance    cell              Cell value must be a non negative value.      Units Sold       7.0           G7
+5    Finance    cell              Cell value must be a non negative value.      Units Sold      23.0          G23
+6  Customers    cell                     Cell has an invalid email address           Email       6.0           H6

@@ -107,6 +107,7 @@ sheets:     # names of the sheets of the file
   - Sales
   - Finance
   - Customers
+  - NonExistingSheet
 
 ########################### Sales Sheet ###########################
 
@@ -119,6 +120,7 @@ Sales:
     - Sales Channel
     - Order ID
     - Total Profit
+    - NonExistingColumn
   
   read_as_string:           # columns that are integer or float but the size is too long to fit 
     - Order ID
