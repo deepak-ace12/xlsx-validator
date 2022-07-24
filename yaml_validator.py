@@ -1,6 +1,7 @@
-import os
-import yaml
 import argparse
+import os
+
+import yaml
 
 
 class YamlValidator:
@@ -16,7 +17,7 @@ class YamlValidator:
         validation_errors = []
         sheets = self.dev_yaml.get("sheets")
         if not sheets:
-            validation.append("Yaml must include the list of sheets.")
+            validation_errors.append("Yaml must include the list of sheets.")
 
         for sheet in sheets:
             sheet_data = self.dev_yaml.get(sheet)

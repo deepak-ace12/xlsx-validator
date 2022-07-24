@@ -1,12 +1,12 @@
+import argparse
 import inspect
 import logging
 import sys
 import traceback
 from collections import Counter, defaultdict
+
 import pandas as pd
 import yaml
-import argparse
-
 
 import validators as _validators
 from validators import *  # noqa
@@ -162,9 +162,7 @@ def run_validations(xlsx_file, yaml_file, return_sheet_data=False):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Add path to the yaml and xlsx files."
-    )
+    parser = argparse.ArgumentParser(description="Add path to the yaml and xlsx files.")
     parser.add_argument("--yaml_file_path", required=True, nargs=1, type=str)
     parser.add_argument("--xlsx_file_path", required=True, nargs=1, type=str)
     args = parser.parse_args()
@@ -172,13 +170,19 @@ if __name__ == "__main__":
     xlsx_filepath = args.xlsx_file_path[0]
     is_valid, errors, data = run_validations(xlsx_filepath, yaml_filepath)
     if is_valid:
-        print("The excel file has no validation issues as per the provided configurations in the yaml file.")
+        print(
+            "The excel file has no validation issues as per the provided configurations in the yaml file."
+        )
     else:
-        print("The excel file has validation issues. Please refer the ValitionErrors.log file to find the issues.")
+        print(
+            "The excel file has validation issues. Please refer the ValitionErrors.log file to find the issues."
+        )
         with open("ValidationErrors.log", "w+") as error_logs:
             error_logs.write("Please fix the errors mentioned in the error file.\n\n\n")
             if errors.get("fileErrors"):
                 error_logs.write(errors.get("fileErrors").get("errorMessage") + "\n\n")
-            df = pd.json_normalize(data=errors.get("sheetErrors"), record_path="errors", meta=["sheetName"]).fillna("NA")
-            df.insert(0, 'sheetName', df.pop('sheetName'))
+            df = pd.json_normalize(
+                data=errors.get("sheetErrors"), record_path="errors", meta=["sheetName"]
+            ).fillna("NA")
+            df.insert(0, "sheetName", df.pop("sheetName"))
             error_logs.write(df.to_string())

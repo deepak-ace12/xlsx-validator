@@ -115,16 +115,16 @@ Sales:
   exclude:  # these columns will not be validated
     - Region
     - Country
-  
+
   must_have_columns:
     - Sales Channel
     - Order ID
     - Total Profit
     - NonExistingColumn
-  
-  read_as_string:           # columns that are integer or float but the size is too long to fit 
+
+  read_as_string:           # columns that are integer or float but the size is too long to fit
     - Order ID
-  
+
   validations:
 
     # default validator works for columns for which no validation is defined.
@@ -137,30 +137,30 @@ Sales:
     columns:
       Sales Channel:
         - <<: *sales_channel
-      
+
       Order Priority:
         - <<: *order_priority
-      
+
       Order Date:
         - <<: *usa_date_format
 
       Ship Date:
         - <<: *usa_date_format
-      
+
       Order ID:
         - <<: *digits_only
-      
+
       Total Revenue:
         - <<: *decimal
         - <<: *not_negative
-      
+
       Total Cost:
         - <<: *decimal
         - <<: *not_negative
-      
+
       Total Profit:
         - <<: *decimal
- 
+
 ########################### Finance Sheet ###########################
 
 Finance:
@@ -173,13 +173,13 @@ Finance:
     - Segment
     - Product
     - Sales Team Contact
-  
+
   unique_columns:   # Columns that should be unique
       - Sales Team Contact
 
-  read_as_string:           # columns that are integer or float but the size is too long to fit 
+  read_as_string:           # columns that are integer or float but the size is too long to fit
     - Sales Team Contact   # and need to be read as string to apply validations like min_length max_length
-  
+
   validations:
 
     default:
@@ -188,20 +188,20 @@ Finance:
     columns:
       Product:
         - <<: *products
-      
+
       Manufacturing Price:
         - <<: *not_negative
 
       Sale Price:
         - <<: *not_negative
-      
+
       COGS:
         - <<: *decimal
-      
+
       Units Sold:
         - <<: *not_negative
         - <<: *whole_number
-      
+
       Sales Team Contact:
         - <<: *digits_only
         - <<: *min_length
@@ -211,12 +211,12 @@ Finance:
 
 Customers:
   exclude: [] # No columns to be excluded
-  
+
   must_have_columns: [] # when you're uncertain of columns in the sheet don't put anything here
-  
+
   unique_columns:
     - Email
-  
+
   validations:
 
     # Run default validation for each column except for email
